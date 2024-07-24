@@ -1,0 +1,42 @@
+#include <SPI.h> 
+#include <mcp_can.h> 
+ 
+const int SPI_CS_PIN = 10; // CS pin for the MCP2515 
+MCP_CAN CAN(SPI_CS_PIN);   // Set CS pin 
+ 
+void setup() { 
+  Serial.begin(115200); 
+ 
+  while (CAN_OK != CAN.begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ)) { 
+    Serial.println("CAN BUS Shield init fail"); 
+    Serial.println(" Init CAN BUS Shield again"); 
+    delay(100); 
+  } 
+  Serial.println("CAN BUS Shield init ok!"); 
+  CAN.setMode(MCP_NORMAL); // Set the mode to normal operation 
+} 
+ 
+void loop() { 
+  byte data1[8] = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37}; // Sample data for signal 1 
+  byte data2[8] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17}; // Sample data for signal 2 
+ 
+  // Send first message 
+  if (CAN.sendMsgBuf(0x100, 0, 8, data1) == CAN_OK) { 
+    Serial.println("Message 1 Sent Successfully!"); 
+  } else { 
+    Serial.println("Error Sending Message 1..."); 
+  } 
+ 
+  // Delay to simulate the signal pattern 
+  delay(100); 
+ 
+  // Send second message 
+  if (CAN.sendMsgBuf(0x101, 0, 8, data2) == CAN_OK) { 
+    Serial.println("Message 2 Sent Successfully!"); 
+  } else { 
+    Serial.println("Error Sending Message 2..."); 
+  } 
+ 
+  // Delay to simulate the signal pattern 
+  delay(100); 
+} 
