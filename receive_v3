@@ -1,0 +1,35 @@
+#include <SPI.h> 
+#include <mcp_can.h> 
+ 
+const int SPI_CS_PIN = 10; // CS pin for the MCP2515 
+MCP_CAN CAN(SPI_CS_PIN);   // Set CS pin 
+ 
+void setup() { 
+  Serial.begin(115200); 
+  if (CAN.begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) { 
+    Serial.println("MCP2515 Initialized Successfully!"); 
+  } else { 
+    Serial.println("Error Initializing MCP2515..."); 
+    while (1); 
+  } 
+  CAN.setMode(MCP_NORMAL); // Set the mode to normal operation 
+} 
+ 
+void loop() { 
+  if (CAN_MSGAVAIL == CAN.checkReceive()) { 
+    long unsigned int id; 
+    unsigned char len = 0; 
+    unsigned char buf[8]; 
+    CAN.readMsgBuf(&id, &len, buf); 
+ 
+    Serial.print("Message ID: "); 
+    Serial.println(id, HEX); 
+ 
+    Serial.print("Message Data: "); 
+    for (int i = 0; i < len; i++) { 
+      Serial.print(buf[i], HEX); 
+      Serial.print(" "); 
+    } 
+    Serial.println(); 
+  } 
+} 
